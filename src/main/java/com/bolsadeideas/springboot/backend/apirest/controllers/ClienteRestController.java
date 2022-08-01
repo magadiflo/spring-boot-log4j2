@@ -7,6 +7,8 @@ import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
@@ -30,11 +32,14 @@ import com.bolsadeideas.springboot.backend.apirest.models.services.IClienteServi
 @RequestMapping("/api")
 public class ClienteRestController {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(ClienteRestController.class);
+
 	@Autowired
 	private IClienteService clienteService;
 
 	@GetMapping("/clientes")
 	public List<Cliente> index() {
+		LOGGER.info("Listando los clientes....");
 		return this.clienteService.findAll();
 	}
 
@@ -42,6 +47,8 @@ public class ClienteRestController {
 	// objeto ejmp. Cliente, String, etc..
 	@GetMapping("/clientes/{id}")
 	public ResponseEntity<?> show(@PathVariable Long id) {
+		LOGGER.trace("Buscando cliente con id ".concat(id.toString()));
+
 		Cliente cliente = null;
 		Map<String, Object> response = new HashMap<>();
 		try {
@@ -53,6 +60,8 @@ public class ClienteRestController {
 		}
 
 		if (cliente == null) {
+			LOGGER.error("No se encuentra el cliente con el id ".concat(id.toString()));
+
 			response.put("mensaje", "El cliente con el id ".concat(id.toString()).concat(" no existe en la BD"));
 			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.NOT_FOUND);
 		}
